@@ -15,6 +15,27 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_ID >>
             aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.Workflow_ID >>
+      
+  install_awscli:
+    description: Install AWS CLI
+    steps:
+      - run:
+          name: Install AWS CLI
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+  install_ansible:
+    description: Install Ansible
+    steps:
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
 
 
 jobs:
@@ -150,33 +171,22 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install_awscli
+      - install_ansible
       - add_ssh_keys:
-          fingerprints:
-            - 'ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41'
+          fingerprints: ["ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41"]
+      - attach_workspace:
+          at: ~/
       - run:
-          name: Install dependencies
-          command: |
-            # apk add --update ansible
-            apk add --update --no-cache tar gzip ansible aws-cli
-            - attach_workspace:
-                at: ~/ 
-            -restore_cache:
-              keys: [backend-build]    
-      - run:
-          name: Run Playbook and Configure server
+          name: Configure server & run Ansible playbook
           command: |
             cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml \
-            --key-file ~/ .ssh/id_rsa_ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41
-
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/backend
-      - destroy_environment 
+            cat inventory.txt
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy_environment
 
 workflows:
   default:
