@@ -148,6 +148,36 @@ jobs:
             - project/.circleci/ansible/inventory.txt
       - destroy_environment 
 
+  configure-infrastructure:
+      docker:
+        - image: python:python:3.7-alpine3.11
+      steps:
+        - checkout
+        - add_ssh_keys:
+            fingerprints:
+              - 'ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41'
+        - run:
+            name: Install dependencies
+            command: |
+              # apk add --update ansible
+              apk add --update --no-cache tar gzip ansible aws-cli
+              - attach_workspace:
+                  at: ~/ 
+              -restore_cache:
+                keys: [backend-build]    
+        - run:
+            name: Run Playbook and Configure server
+            command: |
+              cd .circleci/ansible
+              ansible-playbook -i inventory.txt configure-server.yml \
+              --key-file ~/ .ssh/id_rsa_ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41
+
+        - persist_to_workspace:
+            root: ~/
+            paths:
+              - project/backend
+        - destroy_environment 
+
 workflows:
   default:
     jobs:
@@ -166,3 +196,5 @@ workflows:
           filters:
             branches:
               only: [master]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
