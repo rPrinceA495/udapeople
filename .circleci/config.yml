@@ -37,7 +37,7 @@ commands:
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y
 
-  revert-migrations:
+  revert_migrations:
     description: Revert the last migration
     parameters:
       Workflow_ID:
