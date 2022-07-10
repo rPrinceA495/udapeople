@@ -276,10 +276,10 @@ jobs:
       - install_awscli
       - install_ansible
       - run:
-        name: Install Node.js 13
-        command: |
-          curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-          sudo apt install -y nodejs      
+          name: Install Node.js 13
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt install -y nodejs     
       - add_ssh_keys:
           fingerprints: ["ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41"]
       - attach_workspace:
