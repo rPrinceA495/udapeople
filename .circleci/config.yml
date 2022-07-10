@@ -37,14 +37,19 @@ commands:
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y
 
-  revert_migrations:
-    description: Reverting failed migration
+  revert-migrations:
+    description: Revert the last migration
+    parameters:
+      Workflow_ID:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/7hBNZ9bZ3EdXfw398jkVp9/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            SUCCESS=$(curl --insecure  https://kvdb.io/${KVDB_BUCKET}/migration_<< parameters.Workflow_ID >>)
+            # Logic for reverting the database state
             if (( $SUCCESS == 1 ));
             then
               cd ~/project/backend
