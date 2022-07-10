@@ -1,7 +1,7 @@
 version: 2.1
 
 commands:
-  destroy_environment:
+  destroy-environment:
     description: Destroy back-end and front-end stacks.
     parameters:
       Workflow_ID:
@@ -37,7 +37,7 @@ commands:
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y
 
-  revert_migrations:
+  revert-migrations:
     description: Revert the last migration
     parameters:
       Workflow_ID:
@@ -48,7 +48,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/${KVDB_BUCKET}/migration_<< parameters.Workflow_ID >>)
+            SUCCESS=$(curl --insecure  https://kvdb.io/7hBNZ9bZ3EdXfw398jkVp9/migration_<< parameters.Workflow_ID >>)
             # Logic for reverting the database state
             if (( $SUCCESS == 1 ));
             then
@@ -186,7 +186,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy_environment 
+      - destroy-environment 
 
   configure-infrastructure:
     docker:
@@ -205,7 +205,7 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy_environment
+      - destroy-environment
 
   run-migrations:
     docker:
@@ -234,8 +234,8 @@ jobs:
             then
               curl https://kvdb.io/7hBNZ9bZ3EdXfw398jkVp9/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
-      - destroy_environment
-      - revert_migrations
+      - destroy-environment
+      - revert-migrations
 
   deploy-frontend:
     docker:
@@ -270,8 +270,8 @@ jobs:
             cd frontend
             npm run build
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy_environment
-      - revert_migrations
+      - destroy-environment
+      - revert-migrations
 
   deploy-backend:
     docker:
@@ -303,8 +303,8 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml 
-      - destroy_environment
-      - revert_migrations
+      - destroy-environment
+      - revert-migrations
 
   smoke-test:
     docker:
@@ -316,7 +316,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update --no-cache aws-cli
+            apk add --update --no-cache aws-cli curl
       - run:
           name: Backend smoke test.
           command: |
@@ -341,8 +341,8 @@ jobs:
             else
               exit 1
             fi
-      - destroy_environment
-      - revert_migrations
+      - destroy-environment
+      - revert-migrations
 
 workflows:
   default:
@@ -372,3 +372,7 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
+      # - cloudfront-update:
+      #     requires: [smoke-test]
+      # - cleanup:
+      #     requires: [cloudfront-update]
