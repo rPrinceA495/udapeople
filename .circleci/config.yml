@@ -16,7 +16,7 @@ commands:
             aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.Workflow_ID >>
       
-  install_awscli:
+  install-awscli:
     description: Install AWS CLI
     steps:
       - run:
@@ -26,7 +26,7 @@ commands:
             unzip awscliv2.zip
             sudo ./aws/install
 
-  install_ansible:
+  install-ansible:
     description: Install Ansible
     steps:
       - run:
@@ -36,6 +36,15 @@ commands:
             sudo apt install software-properties-common -y
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y
+
+  install-nodejs:
+    description: Install Node.js 13
+    steps:
+      - run:
+          name: Install Node.js 13
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt install -y nodejs
 
   revert-migrations:
     description: Revert the last migration
@@ -193,8 +202,8 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - install_awscli
-      - install_ansible
+      - install-awscli
+      - install-ansible
       - add_ssh_keys:
           fingerprints: ["ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41"]
       - attach_workspace:
@@ -242,12 +251,8 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - install_awscli
-      - run:
-          name: Install Node.js 13
-          command: |
-            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-            sudo apt install -y nodejs
+      - install-awscli
+      - install-nodejs
       - restore_cache:
           keys: [frontend-build]
       - run:
@@ -311,9 +316,9 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - install_awscli
-      - install_ansible
-      - install_nodejs
+      - install-awscli
+      - install-ansible
+      - install-nodejs
       - add_ssh_keys:
           fingerprints: ["ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41"]
       - attach_workspace:
