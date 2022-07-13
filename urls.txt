@@ -5,7 +5,7 @@ https://github.com/rPrinceA495/udapeople
 http://udapeople-72cc486.s3-website-us-east-1.amazonaws.com/
 
 [URL03] - Deployed front-end from S3 bucket using CloudFront as CDN
-http://d1f7299s4bync4.cloudfront.net/#/employees
+https://d1f7299s4bync4.cloudfront.net
 
 [URL04] - Healthy response for back-end application
 https://3.84.235.229:3030/api/status
