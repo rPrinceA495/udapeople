@@ -405,12 +405,7 @@ workflows:
   default:
     jobs:
       - build-backend
-      - test-backend:
-          requires: [build-backend]
-      - scan-backend:
-          requires: [build-backend]
       - deploy-infrastructure:
-          requires: [test-backend, scan-backend]
           filters:
             branches:
               only: [master]
