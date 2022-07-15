@@ -16,19 +16,25 @@
 #     npm i
 - name: "Executing app using pm2"
   shell: |
-    cd ~/backend-app/dist
+    cd ~/backend-app
     ls
-    npm install
-    pm2 stop default
-    pm2 start main.js
+    # npm install
+    # pm2 stop default
+    # pm2 start main.js
+    # pm2 start npm -- start
+    # cd ~/backend-app/dist
+    # ls
+    # npm install
+    # pm2 stop default
+    # pm2 start main.js
     # pm2 start npm -- start
   register: execute_node
 
-- name: print message
-  debug:
-    msg: "{{ execute_node.stdout_lines }}"
+# - name: print message
+#   debug:
+#     msg: "{{ execute_node.stdout_lines }}"
 
-- name: "Configure pm2 to start as service"
-  become: true
-  shell: |
-    env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+# - name: "Configure pm2 to start as service"
+#   become: true
+#   shell: |
+#     env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
