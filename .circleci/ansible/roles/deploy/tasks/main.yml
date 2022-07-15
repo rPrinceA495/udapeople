@@ -15,7 +15,10 @@
     npm i
 - name: "Executing app using pm2"
   shell: |
-    cd ~/backend-app/dist
+    cd ~/backend-app
+    ls
+    cd /dist
+    ls
     pm2 stop default
     pm2 start main.js
     # pm2 start npm -- start
