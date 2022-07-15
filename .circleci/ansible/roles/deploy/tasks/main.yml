@@ -1,28 +1,24 @@
 ---
-- name: "Creates backend app directory"
+- name: "Create directory for backend"
   file:
-    path: ~/backend_app
+    path: ~/backend-app
     state: directory
 
-- name: "Copy compiled backend app"
-  copy:
+- name: "Extract zipped artifact"
+  unarchive:
     src: artifact.tar.gz
-    dest: "~/backend_app/artifact.tar.gz"
+    dest: ~/backend-app
 
-- name: "Unzip backend files to correct directory"
+- name: "Installing dependencies"
   shell: |
-    cd ~/backend_app
-    unzip artifact.tar.gz
-    rm -rf artifact.tar.gz
-- name: "Install dependencies for project"
+    cd ~/backend-app
+    npm i
+- name: "Executing app using pm2"
   shell: |
-    cd ~/backend_app
-    npm install
-- name: "Executing node"
-  shell: |
-    export
-    cd ~/backend_app
+    cd ~/backend-app/dist
+    pm2 stop default
     pm2 start main.js
+    # pm2 start npm -- start
   register: execute_node
 
 - name: print message
@@ -30,37 +26,6 @@
     msg: "{{ execute_node.stdout_lines }}"
 
 - name: "Configure pm2 to start as service"
+  become: true
   shell: |
-    env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
-
-# ---
-# - name: "Create directory for backend"
-#   file:
-#     path: ~/backend-app
-#     state: directory
-
-# - name: "Extract zipped artifact"
-#   unarchive:
-#     src: artifact.tar.gz
-#     dest: ~/backend-app
-
-# - name: "Installing dependencies"
-#   shell: |
-#     cd ~/backend-app
-#     npm i
-# - name: "Executing app using pm2"
-#   shell: |
-#     cd ~/backend-app/dist
-#     pm2 stop default
-#     pm2 start main.js
-#     # pm2 start npm -- start
-#   register: execute_node
-
-# - name: print message
-#   debug:
-#     msg: "{{ execute_node.stdout_lines }}"
-
-# - name: "Configure pm2 to start as service"
-#   become: true
-#   shell: |
-#     env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+    env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
