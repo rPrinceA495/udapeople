@@ -17,8 +17,6 @@
   shell: |
     cd ~/backend-app
     ls
-    cd /dist
-    ls
     pm2 stop default
     pm2 start main.js
     # pm2 start npm -- start
