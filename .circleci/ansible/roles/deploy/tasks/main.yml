@@ -17,7 +17,8 @@
 
 - name: "Executing app using pm2"
   shell: |
-    cd ~/backend-app/dist
+    cd ~/backend-app
+    # cd ~/backend-app/dist
     # ls
     # npm install
     pm2 stop default
