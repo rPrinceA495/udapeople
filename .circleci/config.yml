@@ -310,6 +310,7 @@ jobs:
             # Deployment
             cd backend
             npm install
+            npm install -g typescript
             npm run build
             cd ..
             tar -C backend -czvf artifact.tar.gz .
