@@ -2,13 +2,13 @@
 - name: Copy backend files
   become: true
   copy:
-    src: /home/backend.tar.gz
-    dest: /home/ubuntu/backend.tar.gz
+    src: /home/artifact.tar.gz
+    dest: /home/ubuntu/artifact.tar.gz
 
 - name: Start PM2
   shell: |
     cd /home/ubuntu/
-    tar xzvf backend.tar.gz
+    tar xzvf artifact.tar.gz
     mv home/circleci/project/backend .
     cd backend
     sudo npm install -g npm@latest

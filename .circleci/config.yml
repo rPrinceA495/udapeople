@@ -278,42 +278,6 @@ jobs:
       - destroy-environment
       - revert-migrations
 
-  deploy-backend:
-    docker:
-      - image: python:3.10-alpine3.16
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints: ["ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41"]
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update ansible openssh-client tar gzip curl
-      - restore_cache:
-          keys: [backend-build]  
-      - run:
-          name: Deploy backend
-          command: |
-            cd /home
-            tar czf backend.tar.gz -P /home/circleci/project/backend/dist
-      - run:
-          name: Deploy backend 2
-          command: |
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook \
-              -i .circleci/ansible/inventory.txt \
-              .circleci/ansible/deploy-backend.yml
-      - run:
-          name: Install AWS CLI for rollback
-          when: on_fail
-          command: |
-            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
-      - revert-migrations
-      - destroy-environment
-  
-
   # deploy-backend:
   #   docker:
   #     - image: python:3.10-alpine3.16
@@ -323,31 +287,67 @@ jobs:
   #         fingerprints: ["ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41"]
   #     - attach_workspace:
   #         at: ~/
-  #     - restore_cache:
-  #         keys: [backend-build]
   #     - run:
   #         name: Install dependencies
   #         command: |
-  #           apk add --update --no-cache tar gzip nodejs npm tree aws-cli ansible
+  #           apk add --update ansible openssh-client tar gzip 
+  #     - restore_cache:
+  #         keys: ["backend-dist"]  
   #     - run:
   #         name: Deploy backend
   #         command: |
-  #           # Deployment
-  #           cd backend
-  #           npm install
-  #           npm run build
-  #           cd ..
-  #           # Zip the directory
-  #           tar -C backend -czvf artifact.tar.gz .
-  #           tree -afC /root/project/.circleci -I "node_modules"
-  #           mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
-  #           mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
-  #           cd .circleci/ansible
-  #           echo "Contents  of the inventory.txt file is -------"
-  #           cat inventory.txt
-  #           ansible-playbook -i inventory.txt deploy-backend.yml 
-  #     - destroy-environment
+  #           cd /home
+  #           tar czf backend.tar.gz -P /home/circleci/project/backend/dist
+  #     - run:
+  #         name: Deploy backend 2
+  #         command: |
+  #           export ANSIBLE_HOST_KEY_CHECKING=False
+  #           ansible-playbook \
+  #             -i .circleci/ansible/inventory.txt \
+  #             .circleci/ansible/deploy-backend.yml
+  #     - run:
+  #         name: Install AWS CLI for rollback
+  #         when: on_fail
+  #         command: |
+  #           apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
   #     - revert-migrations
+  #     - destroy-environment
+  
+
+  deploy-backend:
+    docker:
+      - image: python:3.10-alpine3.16
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["ea:16:8b:35:2f:09:0d:15:05:80:b0:b1:a2:cd:21:41"]
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update --no-cache tar gzip nodejs npm tree aws-cli ansible
+      - run:
+          name: Deploy backend
+          command: |
+            # Deployment
+            cd backend
+            npm install
+            npm run build
+            cd ..
+            # Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            # tree -afC /root/project/.circleci -I "node_modules"
+            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
+            mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml 
+      - destroy-environment
+      - revert-migrations
 
   # deploy-backend:
   #   docker:
