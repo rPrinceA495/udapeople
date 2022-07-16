@@ -255,7 +255,7 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - install_awscli
+      - install-awscli
       - run:
           name: Run migrations
           command: |
@@ -424,8 +424,8 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - install_awscli
-      - install_nodejs
+      - install-awscli
+      - install-nodejs
       - run:
           name: Backend smoke test.
           command: |
