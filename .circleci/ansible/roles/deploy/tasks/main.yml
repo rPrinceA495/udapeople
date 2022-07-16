@@ -1,48 +1,30 @@
 ---
-- name: "update apt packages."
-  become: yes
-  apt:
-    update_cache: yes
+- name: "Create directory for backend"
+  file:
+    path: ~/backend-app
+    state: directory
 
-- name: "upgrade packages"
-  become: yes
-  apt:
-    upgrade: yes
+- name: "Extract zipped artifact"
+  unarchive:
+    src: artifact.tar.gz
+    dest: ~/backend-app
 
-- name: remove dependencies that are no longer required
-  become: yes
-  apt:
-    autoremove: yes
-
-# - name: "install dependencies"
-#   become: true
-#   apt:
-#     name: ["nodejs", "npm"]
-#     state: present
-#     update_cache: yes
 - name: "Installing dependencies"
   shell: |
-    sudo apt install aptitude
-    sudo aptitude install nodejs
-    sudo aptitude install npm
-
-- name: "install pm2"
-  become: yes
-  npm:
-    name: pm2
-    global: yes
-    state: latest
-    production: yes
-
-- name: extract artifact
-  become: yes
-  unarchive:
-    src: files/artifact.tar.gz
-    dest: .
-
-- name: start app
-  become: yes
+    cd ~/backend-app
+    npm i
+- name: "Executing app using pm2"
   shell: |
-    pm2 delete all
-    pm2 start npm -- start
+    cd ~/backend-app/dist
+    pm2 stop default
+    pm2 start main.js
+  register: execute_node
 
+- name: print message
+  debug:
+    msg: "{{ execute_node.stdout_lines }}"
+
+- name: "Configure pm2 to start as service"
+  become: true
+  shell: |
+    sudo su -c "env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu"
