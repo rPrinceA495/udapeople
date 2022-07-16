@@ -4,7 +4,6 @@ orbs:
   slack: circleci/slack@4.1
 
 commands:
-
   destroy-environment:
     description: Destroy recently created back-end and front-end stacks.
     parameters:
@@ -235,51 +234,15 @@ jobs:
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-  run-migrations:
-    docker:
-      - image: python:3.7-alpine3.16
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update --no-cache tar gzip nodejs npm aws-cli curl
-      - restore_cache:
-          keys: [backend-build]
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Run migrations
-          command: |
-            cd backend
-            npm install
-            npm run build
-            npm run migrations >> migrations_dump.txt
-            ls -al
-            cat migrations_dump.txt
-      - run:
-          name: Send migration status to kvdb.io
-          command: |
-            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-            then
-              curl https://kvdb.io/7hBNZ9bZ3EdXfw398jkVp9/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-            fi
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-
-
   # run-migrations:
   #   docker:
-  #     - image: circleci/node:13.8.0 
+  #     - image: python:3.7-alpine3.16
   #   steps:
   #     - checkout
   #     - run:
   #         name: Install dependencies
   #         command: |
-  #           sudo apt install -y tar gzip curl
-  #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  #           unzip -qq awscliv2.zip
-  #           sudo ./aws/install
+  #           apk add --update --no-cache tar gzip nodejs npm aws-cli curl
   #     - restore_cache:
   #         keys: [backend-build]
   #     - attach_workspace:
@@ -289,51 +252,51 @@ jobs:
   #         command: |
   #           cd backend
   #           npm install
+  #           npm audit fix --audit-level=critical --force
   #           npm run build
-  #           npm run migrations >> migrations_dump.txt
+  #           npm run migrations >> migrations.txt
   #           ls -al
-  #           cat migrations_dump.txt
+  #           cat migrations.txt
   #     - run:
-  #         name: Send migration results to kvdb
+  #         name: Send migration status to kvdb.io
   #         command: |
-  #           if grep -q "success" ~/project/backend/migrations_dump.txt
+  #           if grep -q "has been executed successfully." ~/project/backend/migrations.txt
   #           then
-  #             curl --insecure https://kvdb.io/7hBNZ9bZ3EdXfw398jkVp9/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
+  #             curl https://kvdb.io/7hBNZ9bZ3EdXfw398jkVp9/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
   #           fi
   #     - destroy-environment:
   #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-  # deploy-frontend:
-  #   docker:
-  #     - image: cimg/base:stable
-  #   steps:
-  #     - checkout
-  #     - install-awscli
-  #     - install-nodejs
-  #     - restore_cache:
-  #         keys: [frontend-build]
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           cd frontend
-  #           npm install
-  #     - run:
-  #         name: Get backend url
-  #         command: |
-  #           BACKEND_IP=$(aws ec2 describe-instances \
-  #             --filters "Name=tag:Name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --output text)
-  #           echo "API_URL=http://${BACKEND_IP}:3030" >> frontend/.env
-  #           cat frontend/.env
-  #     - run:
-  #         name: Deploy frontend objects
-  #         command: |
-  #           cd frontend
-  #           npm run build
-  #           aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-  #     - destroy-environment
-  #     - revert-migrations
+  run-migrations:
+    docker:
+      - image: circleci/node:13.8.0 
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt install -y tar gzip curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip -qq awscliv2.zip
+            sudo ./aws/install
+      - restore_cache:
+          keys: [backend-build]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            npm run migrations >> migrations.txt
+      - run:
+          name: Send migration results to kvdb
+          command: |
+            if grep -q "success" ~/project/backend/migrations.txt
+            then
+              curl --insecure https://kvdb.io/7hBNZ9bZ3EdXfw398jkVp9/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
+            fi
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   deploy-frontend:
     docker:
@@ -381,15 +344,16 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update --no-cache tar gzip nodejs npm aws-cli ansible
-      - restore_cache:
-          keys: [backend-build]
       - attach_workspace:
           at: ~/
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: Deploy backend
           command: |
             cd backend
             npm install
+            # npm audit fix --audit-level=critical --force
             npm run build
             cd ..
             tar -C backend -czvf artifact.tar.gz .
