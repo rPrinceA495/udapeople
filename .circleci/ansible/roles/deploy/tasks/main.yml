@@ -14,12 +14,17 @@
   apt:
     autoremove: yes
 
-- name: "install dependencies"
-  become: true
-  apt:
-    name: ["nodejs", "npm"]
-    state: present
-    update_cache: yes
+# - name: "install dependencies"
+#   become: true
+#   apt:
+#     name: ["nodejs", "npm"]
+#     state: present
+#     update_cache: yes
+- name: "Installing dependencies"
+  shell: |
+    sudo apt install aptitude
+    sudo aptitude install nodejs
+    sudo aptitude install npm
 
 - name: "install pm2"
   become: yes
