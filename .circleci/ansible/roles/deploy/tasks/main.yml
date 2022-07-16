@@ -5,11 +5,11 @@
     upgrade: yes
     update_cache: yes
     cache_valid_time: 86400
-- name: remove unneeded deps
+- name: remove unnecessary dependencies
   become: yes
   apt:
     autoremove: yes
-- name: install deps
+- name: install dependencies
   become: yes
   apt:
     name: ['nodejs', 'npm']
