@@ -219,7 +219,6 @@ jobs:
       - run:
           name: Configure server
           command: |
-            # add environment variables to server
             echo ENVIRONMENT=production > backend/.env
             echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> backend/.env
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
@@ -269,6 +268,8 @@ jobs:
             apk add --update --no-cache tar gzip nodejs npm aws-cli curl
       - restore_cache:
           keys: [backend-build]
+      - attach_workspace:
+          at: ~/
       - run:
           name: Run migrations
           command: |
@@ -331,10 +332,10 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update --no-cache tar gzip nodejs npm tree aws-cli ansible curl
-      - attach_workspace:
-          at: ~/
       - restore_cache:
           keys: [backend-build]
+      - attach_workspace:
+          at: ~/
       - run:
           name: Deploy backend
           command: |
