@@ -463,7 +463,7 @@ jobs:
           command: |
             cd .circleci/ansible
             cat inventory.txt
-            ansible-playbook -i inventory.txt node-exporter.yml
+            ansible-playbook -i inventory.txt export-nodes.yml
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
