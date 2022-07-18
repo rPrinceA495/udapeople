@@ -68,3 +68,6 @@ node_modules
 
 .env
 dist
+
+.circleci/files/prometheus.sh
+.circleci/files/prometheus-server.yml

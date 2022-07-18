@@ -11,3 +11,4 @@ http://d1f7299s4bync4.cloudfront.net
 https://3.84.235.229:3030/api/status
 
 [URL05] - Prometheus Server evidence
+http://ec2-54-80-196-167.compute-1.amazonaws.com:9090/
