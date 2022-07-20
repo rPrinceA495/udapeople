@@ -2,13 +2,13 @@
 https://github.com/rPrinceA495/udapeople
 
 [URL02] - Deployed front-end from S3 bucket
-http://udapeople-72cc486.s3-website-us-east-1.amazonaws.com/
+http://udapeople-73a21fe.s3-website-us-east-1.amazonaws.com
 
 [URL03] - Deployed front-end from S3 bucket using CloudFront as CDN
 http://d1f7299s4bync4.cloudfront.net
 
 [URL04] - Healthy response for back-end application
-http://54.147.42.196:3030/api/status
+http://100.27.20.6:3030/api/status
 
 [URL05] - Prometheus Server evidence
-http://ec2-54-80-196-167.compute-1.amazonaws.com:9090/
+http://ec2-18-232-109-23.compute-1.amazonaws.com:9090/
