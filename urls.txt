@@ -2,7 +2,7 @@
 https://github.com/rPrinceA495/udapeople
 
 [URL02] - Deployed front-end from S3 bucket
-http://udapeople-73a21fe.s3-website-us-east-1.amazonaws.com
+http://udapeople-0b9fbe7.s3-website-us-east-1.amazonaws.com/
 
 [URL03] - Deployed front-end from S3 bucket using CloudFront as CDN
 http://d1f7299s4bync4.cloudfront.net
